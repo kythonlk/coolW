@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:minWidth="250dp"
-    android:minHeight="160dp"
+    android:minWidth="180dp"
+    android:minHeight="110dp"
     android:updatePeriodMillis="1800000"
-    android:initialLayout="@layout/widget_nothing_clock"
+    android:initialLayout="@layout/widget_nothing_headphones"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen" />

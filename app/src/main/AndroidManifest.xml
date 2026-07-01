@@ -5,6 +5,17 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.health.READ_STEPS" />
+
+    <queries>
+        <package android:name="com.google.android.apps.healthdata" />
+    </queries>
 
     <application
         android:allowBackup="true"
@@ -24,6 +35,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity-alias
+            android:name="ViewPermissionUsageActivity"
+            android:exported="true"
+            android:targetActivity=".MainActivity"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
+            </intent-filter>
+        </activity-alias>
 
         <!-- Widgets -->
         <receiver
@@ -70,6 +92,19 @@
                 android:resource="@xml/nothing_music_widget_info" />
         </receiver>
 
+        <receiver
+            android:name=".NothingHeadphonesWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.kythonlk.coolw.ACTION_HEADPHONE_UPDATE" />
+                <action android:name="com.kythonlk.coolw.UPDATE_ALL_WIDGETS" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/nothing_headphones_widget_info" />
+        </receiver>
+
         <!-- Alarm Receiver -->
         <receiver
             android:name=".AlarmReceiver"
@@ -85,6 +120,16 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
+        <service
+            android:name=".StepCounterService"
+            android:exported="false"
+            android:foregroundServiceType="health" />
+
+        <service
+            android:name=".BluetoothHeadphoneService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
 
     </application>
 

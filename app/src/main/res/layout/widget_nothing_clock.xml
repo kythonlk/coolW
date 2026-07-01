@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/nothing_widget_background"
-    android:padding="16dp">
+    android:padding="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,11 +25,11 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="4dp">
 
             <ImageView
-                android:layout_width="6dp"
-                android:layout_height="6dp"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
                 android:src="@drawable/nothing_red_dot"
                 android:layout_marginEnd="6dp"
                 android:contentDescription="Red Dot" />
@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:text="WED, JUL 1"
                 android:textColor="#88FFFFFF"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:fontFamily="sans-serif-medium"
                 android:textAllCaps="true" />
         </LinearLayout>

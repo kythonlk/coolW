@@ -41,5 +41,16 @@
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="0.1" />
 
+        <TextView
+            android:id="@+id/steps_source"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DEVICE SENSOR"
+            android:textColor="#44FFFFFF"
+            android:textSize="8sp"
+            android:layout_marginTop="2dp"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.1" />
+
     </LinearLayout>
 </RelativeLayout>

@@ -6,7 +6,6 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -20,6 +19,11 @@ class NothingStepsWidget : AppWidgetProvider() {
         const val ACTION_STEP_UPDATE = "com.kythonlk.coolw.ACTION_STEP_UPDATE"
     }
 
+    override fun onEnabled(context: Context) {
+        super.onEnabled(context)
+        StepCounterService.start(context)
+    }
+
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (intent.action == ACTION_STEP_UPDATE || intent.action == "com.kythonlk.coolw.UPDATE_ALL_WIDGETS") {
@@ -31,9 +35,11 @@ class NothingStepsWidget : AppWidgetProvider() {
     }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        val prefs = context.getSharedPreferences("CoolWPrefs", Context.MODE_PRIVATE)
-        val steps = prefs.getInt("steps_today", 0)
-        val goal = prefs.getInt("steps_goal", 10000)
+        val prefs = CoolWPrefs.prefs(context)
+        val steps = prefs.getInt(CoolWPrefs.STEPS_TODAY, 0)
+        val goal = prefs.getInt(CoolWPrefs.STEPS_GOAL, 10000)
+        val source = prefs.getString(CoolWPrefs.STEPS_SOURCE, CoolWPrefs.SOURCE_NONE)
+            ?: CoolWPrefs.SOURCE_NONE
 
         val stepsRingBitmap = drawStepsRing(context, steps, goal)
 
@@ -41,6 +47,7 @@ class NothingStepsWidget : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.widget_nothing_steps)
             views.setImageViewBitmap(R.id.steps_image, stepsRingBitmap)
             views.setTextViewText(R.id.steps_goal, "GOAL: $goal")
+            views.setTextViewText(R.id.steps_source, HealthConnectHelper.sourceLabel(source))
 
             // On click, open the app
             val appIntent = Intent(context, MainActivity::class.java)

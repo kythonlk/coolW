@@ -189,13 +189,22 @@
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:layout_marginTop="2dp" />
+
+                    <TextView
+                        android:id="@+id/tv_step_source"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="DEVICE SENSOR"
+                        android:textColor="#66FFFFFF"
+                        android:textSize="9sp"
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
 
                 <Button
-                    android:id="@+id/btn_simulate_walk"
+                    android:id="@+id/btn_sync_steps"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="WALK (+500)"
+                    android:text="SYNC FIT"
                     android:textColor="#FFFFFF"
                     android:backgroundTint="#20FFFFFF"
                     android:textSize="10sp"
@@ -298,6 +307,47 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:text="ENABLE"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#20FFFFFF"
+                    android:textSize="10sp"
+                    app:cornerRadius="6dp" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#15FFFFFF"
+                android:layout_marginVertical="8dp" />
+
+            <!-- Bluetooth headphone sync -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp">
+
+                <TextView
+                    android:id="@+id/tv_bluetooth_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bluetooth Headphone Sync"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_bluetooth_label"
+                    android:text="Shows Wiwu battery and mode on the widget"
+                    android:textColor="#88FFFFFF"
+                    android:textSize="10sp" />
+
+                <Button
+                    android:id="@+id/btn_bluetooth_permission"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="GRANT"
                     android:textColor="#FFFFFF"
                     android:backgroundTint="#20FFFFFF"
                     android:textSize="10sp"

@@ -13,10 +13,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -34,25 +30,37 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.health.connect.client.PermissionController
 import com.kythonlk.coolw.databinding.ActivityMainBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MainActivity : AppCompatActivity(), SensorEventListener {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var dbHelper: TodoDatabaseHelper
-    
-    private var sensorManager: SensorManager? = null
-    private var stepSensor: Sensor? = null
-    private var stepOffset = -1
+    private val activityScope = CoroutineScope(Dispatchers.Main)
+
+    private val healthPermissionLauncher = registerForActivityResult(
+        PermissionController.createRequestPermissionResultContract()
+    ) { granted ->
+        if (granted.contains(HealthConnectHelper.stepsReadPermission)) {
+            StepCounterService.start(this)
+            refreshStepsUI()
+            Toast.makeText(this, "Health Connect steps enabled", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     // Broadcast receiver to update UI when alarms trigger or music updates
     private val uiUpdateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             refreshTodoList()
             updateMusicInfoText()
+            refreshStepsUI()
         }
     }
 
@@ -81,10 +89,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         )
         binding.headerLogo.setImageBitmap(logoBitmap)
 
-        // 2. Setup Step Sensor
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        stepSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+        // 2. Start background sync services
         requestPermissionsIfNeeded()
+        StepCounterService.start(this)
+        BluetoothHeadphoneService.start(this)
 
         // 3. UI Buttons Actions
         binding.btnImportJson.setOnClickListener {
@@ -95,8 +103,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             showAddManualDialog()
         }
 
-        binding.btnSimulateWalk.setOnClickListener {
-            simulateSteps()
+        binding.btnSyncSteps.setOnClickListener {
+            requestHealthConnectPermission()
+        }
+
+        binding.btnBluetoothPermission.setOnClickListener {
+            requestBluetoothPermission()
         }
 
         binding.btnPlayMusic.setOnClickListener {
@@ -121,6 +133,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val filter = IntentFilter().apply {
             addAction("com.kythonlk.coolw.TODO_REFRESH")
             addAction("com.kythonlk.coolw.ACTION_MUSIC_UPDATE")
+            addAction(NothingStepsWidget.ACTION_STEP_UPDATE)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(uiUpdateReceiver, filter, RECEIVER_EXPORTED)
@@ -135,16 +148,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         updateMusicInfoText()
         refreshTodoList()
         updatePermissionButtonsState()
-        
-        // Register step sensor
-        stepSensor?.let {
-            sensorManager?.registerListener(this, it, SensorManager.SENSOR_DELAY_UI)
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        sensorManager?.unregisterListener(this)
     }
 
     override fun onDestroy() {
@@ -424,59 +427,69 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
-    // --- STEPS SIMULATOR & SENSOR TRACKING ---
+    // --- STEPS ---
 
     private fun refreshStepsUI() {
-        val prefs = getSharedPreferences("CoolWPrefs", Context.MODE_PRIVATE)
-        val steps = prefs.getInt("steps_today", 0)
+        val prefs = CoolWPrefs.prefs(this)
+        val steps = prefs.getInt(CoolWPrefs.STEPS_TODAY, 0)
+        val source = prefs.getString(CoolWPrefs.STEPS_SOURCE, CoolWPrefs.SOURCE_NONE)
+            ?: CoolWPrefs.SOURCE_NONE
         binding.tvStepCount.text = String.format("%,d Steps", steps)
+        binding.tvStepSource.text = HealthConnectHelper.sourceLabel(source)
     }
 
-    private fun simulateSteps() {
-        val prefs = getSharedPreferences("CoolWPrefs", Context.MODE_PRIVATE)
-        val steps = prefs.getInt("steps_today", 0)
-        val newSteps = steps + 500
-        prefs.edit().putInt("steps_today", newSteps).apply()
-        
-        refreshStepsUI()
-        
-        // Notify Steps Widget
-        val intent = Intent(this, NothingStepsWidget::class.java).apply {
-            action = NothingStepsWidget.ACTION_STEP_UPDATE
+    private fun requestHealthConnectPermission() {
+        if (!HealthConnectHelper.isAvailable(this)) {
+            Toast.makeText(
+                this,
+                "Install Health Connect to sync Google Fit steps",
+                Toast.LENGTH_LONG
+            ).show()
+            try {
+                startActivity(
+                    Intent(Intent.ACTION_VIEW).apply {
+                        data = Uri.parse("market://details?id=com.google.android.apps.healthdata")
+                    }
+                )
+            } catch (_: Exception) {
+                startActivity(
+                    Intent(Intent.ACTION_VIEW).apply {
+                        data = Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata")
+                    }
+                )
+            }
+            return
         }
-        sendBroadcast(intent)
-        
-        Toast.makeText(this, "+500 steps simulated!", Toast.LENGTH_SHORT).show()
-    }
 
-    override fun onSensorChanged(event: SensorEvent) {
-        if (event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
-            val totalSteps = event.values[0].toInt()
-            val prefs = getSharedPreferences("CoolWPrefs", Context.MODE_PRIVATE)
-            
-            if (stepOffset == -1) {
-                // Initialize step offset
-                stepOffset = prefs.getInt("sensor_step_offset", -1)
-                if (stepOffset == -1 || stepOffset > totalSteps) {
-                    stepOffset = totalSteps
-                    prefs.edit().putInt("sensor_step_offset", stepOffset).apply()
-                }
+        activityScope.launch {
+            if (HealthConnectHelper.hasStepsPermission(this@MainActivity)) {
+                StepCounterService.start(this@MainActivity)
+                refreshStepsUI()
+                Toast.makeText(this@MainActivity, "Steps already synced from Health Connect", Toast.LENGTH_SHORT).show()
+            } else {
+                healthPermissionLauncher.launch(setOf(HealthConnectHelper.stepsReadPermission))
             }
-            
-            val stepsToday = totalSteps - stepOffset
-            prefs.edit().putInt("steps_today", stepsToday).apply()
-            
-            refreshStepsUI()
-            
-            // Notify widget
-            val intent = Intent(this, NothingStepsWidget::class.java).apply {
-                action = NothingStepsWidget.ACTION_STEP_UPDATE
-            }
-            sendBroadcast(intent)
         }
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+    private fun requestBluetoothPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.BLUETOOTH_CONNECT),
+                    201
+                )
+                return
+            }
+        }
+
+        BluetoothHeadphoneService.start(this)
+        Toast.makeText(this, "Bluetooth headphone sync active", Toast.LENGTH_SHORT).show()
+        updatePermissionButtonsState()
+    }
 
     // --- MUSIC CONTROLLERS ---
 
@@ -536,6 +549,22 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 200 && grantResults.any { it == PackageManager.PERMISSION_GRANTED }) {
+            StepCounterService.start(this)
+            refreshStepsUI()
+        }
+        if (requestCode == 201 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            BluetoothHeadphoneService.start(this)
+            updatePermissionButtonsState()
+        }
+    }
+
     private fun toggleNotificationListenerPermission() {
         val cn = ComponentName(this, MediaNotificationListener::class.java)
         val flat = Settings.Secure.getString(contentResolver, "enabled_notification_listeners")
@@ -581,6 +610,20 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
         binding.btnGrantAlarmPermission.text = if (canScheduleExact) "GRANTED" else "GRANT"
         binding.btnGrantAlarmPermission.isEnabled = !canScheduleExact
+
+        val hasBluetooth = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) ==
+                PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+        binding.btnBluetoothPermission.text = if (hasBluetooth) "GRANTED" else "GRANT"
+        binding.btnBluetoothPermission.isEnabled = !hasBluetooth
+
+        activityScope.launch {
+            val hasHealth = HealthConnectHelper.hasStepsPermission(this@MainActivity)
+            binding.btnSyncSteps.text = if (hasHealth) "SYNCED" else "SYNC FIT"
+        }
     }
 
     private fun triggerWidgetUpdate() {
