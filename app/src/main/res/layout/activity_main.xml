@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="12dp">
 
         <!-- HEADER -->
         <LinearLayout
@@ -20,8 +20,8 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="24dp">
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp">
 
             <ImageView
                 android:id="@+id/header_logo"
@@ -58,8 +58,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@drawable/nothing_widget_background"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
+            android:padding="12dp"
+            android:layout_marginBottom="12dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -143,8 +143,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@drawable/nothing_widget_background"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
+            android:padding="12dp"
+            android:layout_marginBottom="12dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -163,8 +163,16 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:background="#0AFFFFFF"
-                android:padding="12dp"
-                android:layout_marginBottom="10dp">
+                android:padding="8dp"
+                android:layout_marginBottom="8dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_steps"
+                    android:layout_marginEnd="12dp"
+                    android:alpha="0.7"
+                    android:contentDescription="Steps Icon" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -218,7 +226,15 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:background="#0AFFFFFF"
-                android:padding="12dp">
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_music"
+                    android:layout_marginEnd="12dp"
+                    android:alpha="0.7"
+                    android:contentDescription="Music Icon" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -265,8 +281,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@drawable/nothing_widget_background"
-            android:padding="16dp"
-            android:layout_marginBottom="24dp">
+            android:padding="12dp"
+            android:layout_marginBottom="16dp">
 
             <TextView
                 android:layout_width="wrap_content"

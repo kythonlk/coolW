@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/nothing_widget_background"
-    android:padding="16dp">
+    android:padding="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,39 +11,23 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <!-- Header -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
-            
-            <ImageView
-                android:layout_width="5dp"
-                android:layout_height="5dp"
-                android:src="@drawable/nothing_red_dot"
-                android:layout_marginEnd="6dp"
-                android:contentDescription="Red Dot" />
-                
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="MUSIC PLAYER"
-                android:textColor="#88FFFFFF"
-                android:textSize="9sp"
-                android:fontFamily="sans-serif-black"
-                android:letterSpacing="0.2" />
-        </LinearLayout>
+        <!-- Album Art / Placeholder -->
+        <ImageView
+            android:id="@+id/music_icon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_music"
+            android:alpha="0.6"
+            android:layout_marginBottom="8dp"
+            android:contentDescription="Music Icon" />
 
-        <!-- Song info -->
         <TextView
             android:id="@+id/music_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Nothing Track"
             android:textColor="#FFFFFFFF"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textStyle="bold"
             android:singleLine="true"
             android:ellipsize="end"
@@ -56,7 +40,7 @@
             android:layout_height="wrap_content"
             android:text="Nothing OS"
             android:textColor="#88FFFFFF"
-            android:textSize="11sp"
+            android:textSize="10sp"
             android:singleLine="true"
             android:ellipsize="end"
             android:gravity="center"
@@ -69,44 +53,46 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            android:layout_marginTop="12dp">
+            android:layout_marginTop="10dp">
 
-            <!-- Prev -->
-            <TextView
+            <ImageView
                 android:id="@+id/btn_prev"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="6dp"
+                android:src="@drawable/ic_prev"
+                android:contentDescription="Previous"
+                android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+            <FrameLayout
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:gravity="center"
-                android:text="⏮"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:clickable="true"
-                android:focusable="true" />
+                android:layout_marginHorizontal="12dp">
 
-            <!-- Play/Pause -->
-            <TextView
-                android:id="@+id/btn_play_pause"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:gravity="center"
-                android:text="▶"
-                android:textColor="#FFFFFF"
-                android:textSize="22sp"
-                android:clickable="true"
-                android:focusable="true"
-                android:layout_marginHorizontal="16dp" />
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/nothing_red_dot"
+                    android:alpha="0.9"
+                    android:contentDescription="@null" />
 
-            <!-- Next -->
-            <TextView
+                <ImageView
+                    android:id="@+id/btn_play_pause"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_play"
+                    android:contentDescription="Play/Pause" />
+            </FrameLayout>
+
+            <ImageView
                 android:id="@+id/btn_next"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:gravity="center"
-                android:text="⏭"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:clickable="true"
-                android:focusable="true" />
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:padding="6dp"
+                android:src="@drawable/ic_next"
+                android:contentDescription="Next"
+                android:background="?android:attr/selectableItemBackgroundBorderless" />
 
         </LinearLayout>
 

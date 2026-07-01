@@ -6,10 +6,11 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
+import androidx.core.content.edit
 import android.media.AudioManager
 import android.os.SystemClock
 import android.view.KeyEvent
+import android.graphics.Color
 import android.widget.RemoteViews
 
 class NothingMusicWidget : AppWidgetProvider() {
@@ -31,26 +32,24 @@ class NothingMusicWidget : AppWidgetProvider() {
                 ACTION_PLAY_PAUSE -> KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
                 ACTION_NEXT -> KeyEvent.KEYCODE_MEDIA_NEXT
                 ACTION_PREV -> KeyEvent.KEYCODE_MEDIA_PREVIOUS
-                else -> -1
+                else -> return
             }
 
-            if (keyCode != -1) {
-                val eventTime = SystemClock.uptimeMillis()
-                
-                // Dispatch key down
-                val downEvent = KeyEvent(eventTime, eventTime, KeyEvent.ACTION_DOWN, keyCode, 0)
-                audioManager.dispatchMediaKeyEvent(downEvent)
-                
-                // Dispatch key up
-                val upEvent = KeyEvent(eventTime, eventTime, KeyEvent.ACTION_UP, keyCode, 0)
-                audioManager.dispatchMediaKeyEvent(upEvent)
-            }
+            val eventTime = SystemClock.uptimeMillis()
+            
+            // Dispatch key down
+            val downEvent = KeyEvent(eventTime, eventTime, KeyEvent.ACTION_DOWN, keyCode, 0)
+            audioManager.dispatchMediaKeyEvent(downEvent)
+            
+            // Dispatch key up
+            val upEvent = KeyEvent(eventTime, eventTime, KeyEvent.ACTION_UP, keyCode, 0)
+            audioManager.dispatchMediaKeyEvent(upEvent)
 
             // Toggling local playing state to make widget immediately responsive
             if (action == ACTION_PLAY_PAUSE) {
-                val prefs = context.getSharedPreferences("CoolWPrefs", Context.MODE_PRIVATE)
+                val prefs = CoolWPrefs.prefs(context)
                 val isPlaying = prefs.getBoolean("music_is_playing", false)
-                prefs.edit().putBoolean("music_is_playing", !isPlaying).apply()
+                prefs.edit { putBoolean("music_is_playing", !isPlaying) }
             }
 
             // Trigger widget redraw
@@ -67,7 +66,7 @@ class NothingMusicWidget : AppWidgetProvider() {
     }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        val prefs = context.getSharedPreferences("CoolWPrefs", Context.MODE_PRIVATE)
+        val prefs = CoolWPrefs.prefs(context)
         val title = prefs.getString("music_title", "Nothing Track") ?: "Nothing Track"
         val artist = prefs.getString("music_artist", "Nothing OS") ?: "Nothing OS"
         val isPlaying = prefs.getBoolean("music_is_playing", false)
@@ -77,7 +76,10 @@ class NothingMusicWidget : AppWidgetProvider() {
             
             views.setTextViewText(R.id.music_title, title)
             views.setTextViewText(R.id.music_artist, artist)
-            views.setTextViewText(R.id.btn_play_pause, if (isPlaying) "⏸" else "▶")
+            views.setImageViewResource(R.id.btn_play_pause, if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play)
+            
+            // Tint the play/pause icon black because it sits on a red background
+            views.setInt(R.id.btn_play_pause, "setColorFilter", Color.BLACK)
 
             // Set up PendingIntents for controls
             views.setOnClickPendingIntent(R.id.btn_prev, getPendingSelfIntent(context, ACTION_PREV, 10))

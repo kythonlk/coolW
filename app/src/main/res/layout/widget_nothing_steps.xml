@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/nothing_widget_background"
-    android:padding="16dp">
+    android:padding="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,46 +11,45 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="STEPS"
-            android:textColor="#88FFFFFF"
-            android:textSize="10sp"
-            android:fontFamily="sans-serif-black"
-            android:letterSpacing="0.2"
-            android:layout_marginBottom="8dp" />
-
         <ImageView
             android:id="@+id/steps_image"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:layout_gravity="center"
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
             android:contentDescription="Steps Progress" />
 
         <TextView
-            android:id="@+id/steps_goal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="GOAL: 10,000"
-            android:textColor="#55FFFFFF"
+            android:text="STEPS"
+            android:textColor="#88FFFFFF"
             android:textSize="9sp"
-            android:layout_marginTop="8dp"
-            android:fontFamily="sans-serif-medium"
-            android:letterSpacing="0.1" />
+            android:layout_marginTop="6dp"
+            android:fontFamily="sans-serif-black"
+            android:letterSpacing="0.2" />
 
         <TextView
             android:id="@+id/steps_source"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="DEVICE SENSOR"
+            android:text="DEVICE"
             android:textColor="#44FFFFFF"
             android:textSize="8sp"
-            android:layout_marginTop="2dp"
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="0.1" />
+
+        <TextView
+            android:id="@+id/steps_goal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GOAL: 10K"
+            android:textColor="#55FFFFFF"
+            android:textSize="9sp"
+            android:layout_marginTop="2dp"
+            android:fontFamily="sans-serif-medium"
+            android:visibility="gone" />
 
     </LinearLayout>
 </RelativeLayout>

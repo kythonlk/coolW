@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/nothing_widget_background"
-    android:padding="16dp">
+    android:padding="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,90 +11,49 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
-
-            <ImageView
-                android:layout_width="5dp"
-                android:layout_height="5dp"
-                android:src="@drawable/nothing_red_dot"
-                android:layout_marginEnd="6dp"
-                android:contentDescription="Red Dot" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="HEADPHONES"
-                android:textColor="#88FFFFFF"
-                android:textSize="9sp"
-                android:fontFamily="sans-serif-black"
-                android:letterSpacing="0.2" />
-        </LinearLayout>
-
         <ImageView
             android:id="@+id/headphone_icon"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:src="@drawable/ic_headphones"
-            android:contentDescription="Headphones" />
-
-        <TextView
-            android:id="@+id/headphone_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="WIWU"
-            android:textColor="#FFFFFFFF"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:layout_marginTop="6dp"
-            android:fontFamily="sans-serif-medium" />
+            android:contentDescription="Headphones"
+            android:alpha="0.9" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="10dp">
+            android:gravity="center"
+            android:layout_marginTop="8dp">
 
-            <ImageView
-                android:id="@+id/headphone_battery_ring"
-                android:layout_width="52dp"
-                android:layout_height="52dp"
-                android:layout_marginEnd="10dp"
-                android:contentDescription="Battery Level" />
-
-            <LinearLayout
+            <TextView
+                android:id="@+id/headphone_battery_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:text="85%"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium" />
 
-                <TextView
-                    android:id="@+id/headphone_battery_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="85%"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:fontFamily="sans-serif-medium" />
+            <ImageView
+                android:id="@+id/battery_divider"
+                android:layout_width="1dp"
+                android:layout_height="10dp"
+                android:src="@android:color/white"
+                android:alpha="0.2"
+                android:layout_marginHorizontal="8dp"
+                android:visibility="gone"
+                android:contentDescription="@null" />
 
-                <TextView
-                    android:id="@+id/headphone_mode"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="ANC"
-                    android:textColor="#88FFFFFF"
-                    android:textSize="10sp"
-                    android:layout_marginTop="2dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:letterSpacing="0.1" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/headphone_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ANC"
+                android:textColor="#FF3B30"
+                android:textSize="10sp"
+                android:fontFamily="sans-serif-black"
+                android:letterSpacing="0.1" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

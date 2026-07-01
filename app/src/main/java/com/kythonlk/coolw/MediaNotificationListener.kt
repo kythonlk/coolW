@@ -9,6 +9,7 @@ import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
 import android.service.notification.NotificationListenerService
 import android.util.Log
+import androidx.core.content.edit
 
 class MediaNotificationListener : NotificationListenerService(), MediaSessionManager.OnActiveSessionsChangedListener {
 
@@ -95,11 +96,9 @@ class MediaNotificationListener : NotificationListenerService(), MediaSessionMan
         val title = metadata.getString(MediaMetadata.METADATA_KEY_TITLE) ?: "Nothing Track"
         val artist = metadata.getString(MediaMetadata.METADATA_KEY_ARTIST) ?: "Nothing OS"
         
-        val prefs = getSharedPreferences("CoolWPrefs", Context.MODE_PRIVATE)
-        prefs.edit().apply {
+        CoolWPrefs.prefs(this).edit {
             putString("music_title", title)
             putString("music_artist", artist)
-            apply()
         }
         triggerWidgetUpdate()
     }
@@ -108,8 +107,9 @@ class MediaNotificationListener : NotificationListenerService(), MediaSessionMan
         if (state == null) return
         val isPlaying = state.state == PlaybackState.STATE_PLAYING
         
-        val prefs = getSharedPreferences("CoolWPrefs", Context.MODE_PRIVATE)
-        prefs.edit().putBoolean("music_is_playing", isPlaying).apply()
+        CoolWPrefs.prefs(this).edit {
+            putBoolean("music_is_playing", isPlaying)
+        }
         
         triggerWidgetUpdate()
     }

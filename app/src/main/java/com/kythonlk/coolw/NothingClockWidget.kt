@@ -44,9 +44,9 @@ class NothingClockWidget : AppWidgetProvider() {
             text = currentTime,
             activeColor = Color.WHITE,
             inactiveColor = Color.parseColor("#15FFFFFF"),
-            dotRadius = 8f,
-            dotSpacing = 24f,
-            charSpacing = 22f,
+            dotRadius = 6f,
+            dotSpacing = 16f,
+            charSpacing = 12f,
             drawInactive = true
         )
 

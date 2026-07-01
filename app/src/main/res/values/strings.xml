@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">coolW</string>
     <string name="health_permission_rationale">CoolW reads your step count from Health Connect to show accurate daily steps on the widget.</string>
+    <string name="widget_name_clock">Clock (Nothing)</string>
+    <string name="widget_name_music">Music (Nothing)</string>
+    <string name="widget_name_steps">Steps (Nothing)</string>
+    <string name="widget_name_headphones">Headphones (Nothing)</string>
 </resources>

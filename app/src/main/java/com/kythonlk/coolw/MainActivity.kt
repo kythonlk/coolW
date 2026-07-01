@@ -91,8 +91,12 @@ class MainActivity : AppCompatActivity() {
 
         // 2. Start background sync services
         requestPermissionsIfNeeded()
-        StepCounterService.start(this)
-        BluetoothHeadphoneService.start(this)
+        if (hasStepPermissions()) {
+            StepCounterService.start(this)
+        }
+        if (hasBluetoothPermissions()) {
+            BluetoothHeadphoneService.start(this)
+        }
 
         // 3. UI Buttons Actions
         binding.btnImportJson.setOnClickListener {
@@ -179,12 +183,12 @@ class MainActivity : AppCompatActivity() {
             val itemLayout = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL
                 gravity = Gravity.CENTER_VERTICAL
-                setPadding(12, 12, 12, 12)
+                setPadding(6, 6, 6, 6)
                 val params = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
-                params.setMargins(0, 0, 0, 10)
+                params.setMargins(0, 0, 0, 8)
                 layoutParams = params
                 
                 // Styling mimicking dark theme card
@@ -631,6 +635,24 @@ class MainActivity : AppCompatActivity() {
             action = "com.kythonlk.coolw.UPDATE_ALL_WIDGETS"
         }
         sendBroadcast(intent)
+    }
+
+    private fun hasStepPermissions(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) ==
+                PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+    }
+
+    private fun hasBluetoothPermissions(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) ==
+                PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
     }
 
     external fun stringFromJNI(): String

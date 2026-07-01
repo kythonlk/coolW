@@ -6,11 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
+import android.view.View
 import android.widget.RemoteViews
 
 class NothingHeadphonesWidget : AppWidgetProvider() {
@@ -42,15 +38,19 @@ class NothingHeadphonesWidget : AppWidgetProvider() {
         val batteryRight = prefs.getInt(CoolWPrefs.BT_BATTERY_RIGHT, -1)
         val mode = prefs.getString(CoolWPrefs.BT_MODE, "—") ?: "—"
 
-        val batteryRing = drawBatteryRing(battery)
         val batteryLabel = formatBatteryLabel(battery, batteryLeft, batteryRight)
 
         for (appWidgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.widget_nothing_headphones)
-            views.setTextViewText(R.id.headphone_name, deviceName.uppercase())
             views.setTextViewText(R.id.headphone_mode, mode.uppercase())
             views.setTextViewText(R.id.headphone_battery_text, batteryLabel)
-            views.setImageViewBitmap(R.id.headphone_battery_ring, batteryRing)
+            
+            if (batteryLeft >= 0 && batteryRight >= 0) {
+                views.setViewVisibility(R.id.battery_divider, View.VISIBLE)
+            } else {
+                views.setViewVisibility(R.id.battery_divider, View.GONE)
+            }
+
             views.setImageViewResource(R.id.headphone_icon, R.drawable.ic_headphones)
 
             val appIntent = Intent(context, MainActivity::class.java)
@@ -70,35 +70,5 @@ class NothingHeadphonesWidget : AppWidgetProvider() {
         if (left >= 0) return "L $left%"
         if (right >= 0) return "R $right%"
         return "—"
-    }
-
-    private fun drawBatteryRing(battery: Int): Bitmap {
-        val size = 120
-        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        val margin = 12f
-        val rect = RectF(margin, margin, size - margin, size - margin)
-
-        val bgPaint = Paint().apply {
-            color = Color.parseColor("#15FFFFFF")
-            style = Paint.Style.STROKE
-            strokeWidth = 8f
-            isAntiAlias = true
-        }
-        canvas.drawCircle(size / 2f, size / 2f, (size / 2f) - margin, bgPaint)
-
-        if (battery >= 0) {
-            val progressPaint = Paint().apply {
-                color = Color.WHITE
-                style = Paint.Style.STROKE
-                strokeWidth = 8f
-                strokeCap = Paint.Cap.ROUND
-                isAntiAlias = true
-            }
-            val sweep = (battery / 100f * 360f).coerceIn(0f, 360f)
-            canvas.drawArc(rect, -90f, sweep, false, progressPaint)
-        }
-
-        return bitmap
     }
 }

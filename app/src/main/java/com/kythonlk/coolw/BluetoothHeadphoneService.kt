@@ -115,55 +115,40 @@ class BluetoothHeadphoneService : Service() {
             return
         }
 
-        queryProfileDevices(BluetoothProfile.A2DP) { a2dpDevices ->
-            val headsetDevices = queryProfileDevicesSync(BluetoothProfile.HEADSET)
-            val allDevices = (a2dpDevices + headsetDevices).distinctBy { it.address }
-            val selected = selectPreferredDevice(allDevices)
+        // To avoid deadlocks and ANR, we query A2DP first, then HEADSET in a chain.
+        adapter.getProfileProxy(this, object : BluetoothProfile.ServiceListener {
+            override fun onServiceConnected(profileId: Int, a2dpProxy: BluetoothProfile?) {
+                val a2dpDevices = a2dpProxy?.connectedDevices.orEmpty()
+                if (a2dpProxy != null) adapter.closeProfileProxy(profileId, a2dpProxy)
+                
+                // Now query Headset
+                adapter.getProfileProxy(this@BluetoothHeadphoneService, object : BluetoothProfile.ServiceListener {
+                    override fun onServiceConnected(pId: Int, headsetProxy: BluetoothProfile?) {
+                        val headsetDevices = headsetProxy?.connectedDevices.orEmpty()
+                        if (headsetProxy != null) adapter.closeProfileProxy(pId, headsetProxy)
+                        
+                        val allDevices = (a2dpDevices + headsetDevices).distinctBy { it.address }
+                        val selected = selectPreferredDevice(allDevices)
 
-            if (selected == null) {
+                        if (selected == null) {
+                            saveDisconnected("NOT CONNECTED")
+                        } else {
+                            publishDeviceState(selected)
+                        }
+                    }
+
+                    override fun onServiceDisconnected(pId: Int) {
+                        // If headset fails, still use A2DP info
+                        val selected = selectPreferredDevice(a2dpDevices)
+                        if (selected == null) saveDisconnected("NOT CONNECTED") else publishDeviceState(selected)
+                    }
+                }, BluetoothProfile.HEADSET)
+            }
+
+            override fun onServiceDisconnected(profileId: Int) {
                 saveDisconnected("NOT CONNECTED")
-            } else {
-                publishDeviceState(selected)
             }
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun queryProfileDevices(profile: Int, callback: (List<BluetoothDevice>) -> Unit) {
-        val adapter = bluetoothAdapter ?: return callback(emptyList())
-        adapter.getProfileProxy(this, object : BluetoothProfile.ServiceListener {
-            override fun onServiceConnected(profileId: Int, proxy: BluetoothProfile?) {
-                val devices = proxy?.connectedDevices.orEmpty()
-                adapter.closeProfileProxy(profileId, proxy)
-                callback(devices)
-            }
-
-            override fun onServiceDisconnected(profileId: Int) {
-                callback(emptyList())
-            }
-        }, profile)
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun queryProfileDevicesSync(profile: Int): List<BluetoothDevice> {
-        val adapter = bluetoothAdapter ?: return emptyList()
-        var devices = emptyList<BluetoothDevice>()
-        val latch = java.util.concurrent.CountDownLatch(1)
-
-        adapter.getProfileProxy(this, object : BluetoothProfile.ServiceListener {
-            override fun onServiceConnected(profileId: Int, proxy: BluetoothProfile?) {
-                devices = proxy?.connectedDevices.orEmpty()
-                adapter.closeProfileProxy(profileId, proxy)
-                latch.countDown()
-            }
-
-            override fun onServiceDisconnected(profileId: Int) {
-                latch.countDown()
-            }
-        }, profile)
-
-        latch.await(2, java.util.concurrent.TimeUnit.SECONDS)
-        return devices
+        }, BluetoothProfile.A2DP)
     }
 
     @SuppressLint("MissingPermission")
@@ -178,9 +163,16 @@ class BluetoothHeadphoneService : Service() {
     private fun publishDeviceState(device: BluetoothDevice) {
         val name = device.name ?: "Headphones"
         val batteryInfo = readBattery(device)
-        val mode = readModeFromMetadata(device)
+        
+        val prefs = CoolWPrefs.prefs(this)
+        val currentMode = prefs.getString(CoolWPrefs.BT_MODE, "—")
+        val mode = if (currentMode == "—" || currentMode == "CONNECTED") {
+            readModeFromMetadata(device)
+        } else {
+            currentMode ?: "CONNECTED"
+        }
 
-        CoolWPrefs.prefs(this).edit(commit = false) {
+        prefs.edit {
             putBoolean(CoolWPrefs.BT_CONNECTED, true)
             putString(CoolWPrefs.BT_DEVICE_NAME, name)
             putInt(CoolWPrefs.BT_BATTERY, batteryInfo.main)
@@ -189,11 +181,11 @@ class BluetoothHeadphoneService : Service() {
             putString(CoolWPrefs.BT_MODE, mode)
         }
 
-        CoolWPrefs.notifyHeadphonesUpdate(this)
+         CoolWPrefs.notifyHeadphonesUpdate(this)
     }
 
     private fun saveDisconnected(status: String) {
-        CoolWPrefs.prefs(this).edit(commit = false) {
+        CoolWPrefs.prefs(this).edit {
             putBoolean(CoolWPrefs.BT_CONNECTED, false)
             putString(CoolWPrefs.BT_DEVICE_NAME, status)
             putInt(CoolWPrefs.BT_BATTERY, -1)
@@ -236,7 +228,9 @@ class BluetoothHeadphoneService : Service() {
 
     @SuppressLint("MissingPermission")
     private fun readModeFromMetadata(device: BluetoothDevice): String {
-        return device.getMetadataCompat(7)?.toMetadataString() ?: "CONNECTED"
+        // Manufacturer specific metadata key for ANC might be 7 for some, but it's non-standard.
+        // We mainly rely on parseVendorEvent for Wiwu.
+        return "CONNECTED"
     }
 
     private fun ByteArray.toBatteryPercent(): Int {
@@ -305,7 +299,10 @@ class BluetoothHeadphoneService : Service() {
             .setContentText("Syncing Bluetooth headphone status")
             .setSmallIcon(R.drawable.ic_headphones)
             .setContentIntent(openApp)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
+            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .build()
     }
 
@@ -323,6 +320,13 @@ class BluetoothHeadphoneService : Service() {
         private const val METADATA_UNTETHERED_RIGHT_BATTERY = 11
 
         fun start(context: Context) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT)
+                    != PackageManager.PERMISSION_GRANTED
+                ) {
+                    return
+                }
+            }
             val intent = Intent(context, BluetoothHeadphoneService::class.java)
             context.startForegroundService(intent)
         }

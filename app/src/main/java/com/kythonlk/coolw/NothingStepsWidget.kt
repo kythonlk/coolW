@@ -61,18 +61,18 @@ class NothingStepsWidget : AppWidgetProvider() {
     }
 
     private fun drawStepsRing(context: Context, steps: Int, goal: Int): Bitmap {
-        val size = 250
+        val size = 200
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
 
         // Draw track circle
-        val margin = 20f
+        val margin = 15f
         val rect = RectF(margin, margin, size - margin, size - margin)
         
         val bgPaint = Paint().apply {
             color = Color.parseColor("#15FFFFFF")
             style = Paint.Style.STROKE
-            strokeWidth = 12f
+            strokeWidth = 10f
             isAntiAlias = true
         }
         canvas.drawCircle(size / 2f, size / 2f, (size / 2f) - margin, bgPaint)
@@ -81,7 +81,7 @@ class NothingStepsWidget : AppWidgetProvider() {
         val progressPaint = Paint().apply {
             color = Color.WHITE
             style = Paint.Style.STROKE
-            strokeWidth = 12f
+            strokeWidth = 10f
             strokeCap = Paint.Cap.ROUND
             isAntiAlias = true
         }
@@ -94,9 +94,9 @@ class NothingStepsWidget : AppWidgetProvider() {
             text = stepsStr,
             activeColor = Color.WHITE,
             inactiveColor = Color.parseColor("#0A121212"),
-            dotRadius = 2.2f,
-            dotSpacing = 7f,
-            charSpacing = 5f,
+            dotRadius = 1.8f,
+            dotSpacing = 6f,
+            charSpacing = 4f,
             drawInactive = false
         )
         

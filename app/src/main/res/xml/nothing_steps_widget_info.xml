@@ -4,5 +4,7 @@
     android:minHeight="140dp"
     android:updatePeriodMillis="1800000"
     android:initialLayout="@layout/widget_nothing_steps"
+    android:previewLayout="@layout/widget_nothing_steps"
+    android:label="@string/widget_name_steps"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen" />

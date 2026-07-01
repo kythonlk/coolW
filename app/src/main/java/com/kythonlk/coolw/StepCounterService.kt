@@ -181,9 +181,12 @@ class StepCounterService : Service(), SensorEventListener {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("CoolW Steps")
             .setContentText("Tracking daily steps")
-            .setSmallIcon(R.drawable.ic_headphones)
+            .setSmallIcon(R.drawable.ic_steps)
             .setContentIntent(openApp)
+            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
+            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .build()
     }
 
@@ -192,6 +195,14 @@ class StepCounterService : Service(), SensorEventListener {
         private const val NOTIFICATION_ID = 1001
 
         fun start(context: Context) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION)
+                    != PackageManager.PERMISSION_GRANTED
+                ) {
+                    return
+                }
+            }
+
             val intent = Intent(context, StepCounterService::class.java)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
