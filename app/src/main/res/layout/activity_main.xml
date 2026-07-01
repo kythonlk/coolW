@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#050505"
+    android:fillViewport="true"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="24dp">
+
+            <ImageView
+                android:id="@+id/header_logo"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:adjustViewBounds="true"
+                android:contentDescription="CoolW Logo" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:src="@drawable/nothing_red_dot"
+                android:contentDescription="Red Accent" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NOTHING OS WIDGET SUITE"
+            android:textColor="#88FFFFFF"
+            android:textSize="11sp"
+            android:fontFamily="sans-serif-black"
+            android:letterSpacing="0.2"
+            android:layout_marginBottom="24dp" />
+
+        <!-- TODO APP CARD -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/nothing_widget_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TODO PLANNER (ADD BY JSON)"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="12dp" />
+
+            <EditText
+                android:id="@+id/et_json_import"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:background="#15FFFFFF"
+                android:hint='Paste Todo JSON here. Format:\n[\n  {"title":"Task", "desc":"Info", "time":"2026-07-02T15:30:00"}\n]'
+                android:textColorHint="#44FFFFFF"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:padding="8dp"
+                android:gravity="top|start"
+                android:fontFamily="monospace"
+                android:inputType="textMultiLine"
+                android:importantForAutofill="no" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp">
+
+                <Button
+                    android:id="@+id/btn_import_json"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="IMPORT JSON"
+                    android:textColor="#000000"
+                    android:backgroundTint="#FFFFFF"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:layout_marginEnd="8dp"
+                    app:cornerRadius="8dp" />
+
+                <Button
+                    android:id="@+id/btn_add_manual"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ADD MANUAL"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#1AFFFFFF"
+                    android:textSize="11sp"
+                    app:cornerRadius="8dp" />
+
+            </LinearLayout>
+
+            <!-- TODO LIST -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ACTIVE TASKS"
+                android:textColor="#55FFFFFF"
+                android:textSize="10sp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.1" />
+
+            <LinearLayout
+                android:id="@+id/todo_list_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </LinearLayout>
+
+        <!-- WIDGET SIMULATOR & MUSIC CARD -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/nothing_widget_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="STEPS &amp; MUSIC DASHBOARD"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Steps counter -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="#0AFFFFFF"
+                android:padding="12dp"
+                android:layout_marginBottom="10dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="DAILY STEPS"
+                        android:textColor="#88FFFFFF"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:id="@+id/tv_step_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 Steps"
+                        android:textColor="#FFFFFF"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="2dp" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_simulate_walk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="WALK (+500)"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#20FFFFFF"
+                    android:textSize="10sp"
+                    app:cornerRadius="6dp" />
+            </LinearLayout>
+
+            <!-- Music Player test -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="#0AFFFFFF"
+                android:padding="12dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MUSIC PREVIEW"
+                        android:textColor="#88FFFFFF"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:id="@+id/tv_music_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nothing Track - Nothing OS"
+                        android:textColor="#FFFFFF"
+                        android:textSize="13sp"
+                        android:layout_marginTop="2dp"
+                        android:singleLine="true"
+                        android:ellipsize="end" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_play_music"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PLAY/PAUSE"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#20FFFFFF"
+                    android:textSize="10sp"
+                    app:cornerRadius="6dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- SYSTEM INTEGRATION CARD -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/nothing_widget_background"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SYSTEM SETTINGS"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Notification Listener sync -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp">
+
+                <TextView
+                    android:id="@+id/tv_notif_sync_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sync Active Music Info"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_notif_sync_label"
+                    android:text="Shows real song details from Spotify, YT, etc."
+                    android:textColor="#88FFFFFF"
+                    android:textSize="10sp" />
+
+                <Button
+                    android:id="@+id/btn_toggle_notif_listener"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="ENABLE"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#20FFFFFF"
+                    android:textSize="10sp"
+                    app:cornerRadius="6dp" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#15FFFFFF"
+                android:layout_marginVertical="8dp" />
+
+            <!-- Exact Alarms permission -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp">
+
+                <TextView
+                    android:id="@+id/tv_alarm_permission_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Exact Alarm Scheduling"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_alarm_permission_label"
+                    android:text="Needed to trigger exact alarms for Todo lists"
+                    android:textColor="#88FFFFFF"
+                    android:textSize="10sp" />
+
+                <Button
+                    android:id="@+id/btn_grant_alarm_permission"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="CHECK"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#20FFFFFF"
+                    android:textSize="10sp"
+                    app:cornerRadius="6dp" />
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

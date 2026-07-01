@@ -1,0 +1,102 @@
+package com.kythonlk.coolw
+
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProvider
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.RectF
+import android.widget.RemoteViews
+
+class NothingStepsWidget : AppWidgetProvider() {
+
+    companion object {
+        const val ACTION_STEP_UPDATE = "com.kythonlk.coolw.ACTION_STEP_UPDATE"
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        if (intent.action == ACTION_STEP_UPDATE || intent.action == "com.kythonlk.coolw.UPDATE_ALL_WIDGETS") {
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val thisAppWidget = ComponentName(context.packageName, NothingStepsWidget::class.java.name)
+            val appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget)
+            onUpdate(context, appWidgetManager, appWidgetIds)
+        }
+    }
+
+    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        val prefs = context.getSharedPreferences("CoolWPrefs", Context.MODE_PRIVATE)
+        val steps = prefs.getInt("steps_today", 0)
+        val goal = prefs.getInt("steps_goal", 10000)
+
+        val stepsRingBitmap = drawStepsRing(context, steps, goal)
+
+        for (appWidgetId in appWidgetIds) {
+            val views = RemoteViews(context.packageName, R.layout.widget_nothing_steps)
+            views.setImageViewBitmap(R.id.steps_image, stepsRingBitmap)
+            views.setTextViewText(R.id.steps_goal, "GOAL: $goal")
+
+            // On click, open the app
+            val appIntent = Intent(context, MainActivity::class.java)
+            val pendingIntent = PendingIntent.getActivity(
+                context, 1, appIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            views.setOnClickPendingIntent(R.id.steps_image, pendingIntent)
+
+            appWidgetManager.updateAppWidget(appWidgetId, views)
+        }
+    }
+
+    private fun drawStepsRing(context: Context, steps: Int, goal: Int): Bitmap {
+        val size = 250
+        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+
+        // Draw track circle
+        val margin = 20f
+        val rect = RectF(margin, margin, size - margin, size - margin)
+        
+        val bgPaint = Paint().apply {
+            color = Color.parseColor("#15FFFFFF")
+            style = Paint.Style.STROKE
+            strokeWidth = 12f
+            isAntiAlias = true
+        }
+        canvas.drawCircle(size / 2f, size / 2f, (size / 2f) - margin, bgPaint)
+
+        // Draw progress arc
+        val progressPaint = Paint().apply {
+            color = Color.WHITE
+            style = Paint.Style.STROKE
+            strokeWidth = 12f
+            strokeCap = Paint.Cap.ROUND
+            isAntiAlias = true
+        }
+        val sweepAngle = (steps.toFloat() / goal.toFloat() * 360f).coerceAtMost(360f)
+        canvas.drawArc(rect, -90f, sweepAngle, false, progressPaint)
+
+        // Draw steps count inside
+        val stepsStr = steps.toString()
+        val stepsBitmap = DotMatrixRenderer.renderText(
+            text = stepsStr,
+            activeColor = Color.WHITE,
+            inactiveColor = Color.parseColor("#0A121212"),
+            dotRadius = 2.2f,
+            dotSpacing = 7f,
+            charSpacing = 5f,
+            drawInactive = false
+        )
+        
+        val left = (size - stepsBitmap.width) / 2f
+        val top = (size - stepsBitmap.height) / 2f
+        canvas.drawBitmap(stepsBitmap, left, top, null)
+
+        return bitmap
+    }
+}

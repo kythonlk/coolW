@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#121212"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/dialog_et_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Task Title"
+        android:textColorHint="#55FFFFFF"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#FFFFFF"
+        android:textSize="15sp"
+        android:inputType="textCapSentences"
+        android:layout_marginBottom="12dp"
+        android:importantForAutofill="no" />
+
+    <EditText
+        android:id="@+id/dialog_et_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Description (optional)"
+        android:textColorHint="#55FFFFFF"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#FFFFFF"
+        android:textSize="13sp"
+        android:inputType="textCapSentences"
+        android:layout_marginBottom="16dp"
+        android:importantForAutofill="no" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/dialog_tv_selected_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="2026-07-01 12:00"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:fontFamily="monospace" />
+
+        <TextView
+            android:id="@+id/dialog_btn_select_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SET TIME"
+            android:textColor="#FF3B30"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true" />
+    </LinearLayout>
+
+</LinearLayout>

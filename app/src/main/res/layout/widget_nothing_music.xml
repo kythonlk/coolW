@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/nothing_widget_background"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+            
+            <ImageView
+                android:layout_width="5dp"
+                android:layout_height="5dp"
+                android:src="@drawable/nothing_red_dot"
+                android:layout_marginEnd="6dp"
+                android:contentDescription="Red Dot" />
+                
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MUSIC PLAYER"
+                android:textColor="#88FFFFFF"
+                android:textSize="9sp"
+                android:fontFamily="sans-serif-black"
+                android:letterSpacing="0.2" />
+        </LinearLayout>
+
+        <!-- Song info -->
+        <TextView
+            android:id="@+id/music_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nothing Track"
+            android:textColor="#FFFFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:fontFamily="sans-serif-medium" />
+
+        <TextView
+            android:id="@+id/music_artist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nothing OS"
+            android:textColor="#88FFFFFF"
+            android:textSize="11sp"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:layout_marginTop="2dp"
+            android:fontFamily="sans-serif" />
+
+        <!-- Controls -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="12dp">
+
+            <!-- Prev -->
+            <TextView
+                android:id="@+id/btn_prev"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="⏮"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- Play/Pause -->
+            <TextView
+                android:id="@+id/btn_play_pause"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="▶"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginHorizontal="16dp" />
+
+            <!-- Next -->
+            <TextView
+                android:id="@+id/btn_next"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="⏭"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>
