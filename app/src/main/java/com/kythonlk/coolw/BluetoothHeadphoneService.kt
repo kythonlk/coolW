@@ -24,6 +24,7 @@ import android.os.IBinder
 import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import java.util.Locale
 
 class BluetoothHeadphoneService : Service() {
@@ -44,7 +45,7 @@ class BluetoothHeadphoneService : Service() {
                 parseVendorEvent(intent)
             }
             when (intent?.action) {
-                BluetoothDevice.ACTION_BATTERY_LEVEL_CHANGED,
+                ACTION_BATTERY_LEVEL_CHANGED,
                 BluetoothHeadset.ACTION_VENDOR_SPECIFIC_HEADSET_EVENT,
                 BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED,
                 BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED,
@@ -58,7 +59,7 @@ class BluetoothHeadphoneService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        val manager = getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
+        val manager = getSystemService(BLUETOOTH_SERVICE) as? BluetoothManager
         bluetoothAdapter = manager?.adapter
         createNotificationChannel()
         registerBluetoothReceiver()
@@ -87,7 +88,7 @@ class BluetoothHeadphoneService : Service() {
 
     private fun registerBluetoothReceiver() {
         val filter = IntentFilter().apply {
-            addAction(BluetoothDevice.ACTION_BATTERY_LEVEL_CHANGED)
+            addAction(ACTION_BATTERY_LEVEL_CHANGED)
             addAction(BluetoothHeadset.ACTION_VENDOR_SPECIFIC_HEADSET_EVENT)
             addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED)
             addAction(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED)
@@ -179,27 +180,27 @@ class BluetoothHeadphoneService : Service() {
         val batteryInfo = readBattery(device)
         val mode = readModeFromMetadata(device)
 
-        CoolWPrefs.prefs(this).edit()
-            .putBoolean(CoolWPrefs.BT_CONNECTED, true)
-            .putString(CoolWPrefs.BT_DEVICE_NAME, name)
-            .putInt(CoolWPrefs.BT_BATTERY, batteryInfo.main)
-            .putInt(CoolWPrefs.BT_BATTERY_LEFT, batteryInfo.left)
-            .putInt(CoolWPrefs.BT_BATTERY_RIGHT, batteryInfo.right)
-            .putString(CoolWPrefs.BT_MODE, mode)
-            .apply()
+        CoolWPrefs.prefs(this).edit(commit = false) {
+            putBoolean(CoolWPrefs.BT_CONNECTED, true)
+            putString(CoolWPrefs.BT_DEVICE_NAME, name)
+            putInt(CoolWPrefs.BT_BATTERY, batteryInfo.main)
+            putInt(CoolWPrefs.BT_BATTERY_LEFT, batteryInfo.left)
+            putInt(CoolWPrefs.BT_BATTERY_RIGHT, batteryInfo.right)
+            putString(CoolWPrefs.BT_MODE, mode)
+        }
 
         CoolWPrefs.notifyHeadphonesUpdate(this)
     }
 
     private fun saveDisconnected(status: String) {
-        CoolWPrefs.prefs(this).edit()
-            .putBoolean(CoolWPrefs.BT_CONNECTED, false)
-            .putString(CoolWPrefs.BT_DEVICE_NAME, status)
-            .putInt(CoolWPrefs.BT_BATTERY, -1)
-            .putInt(CoolWPrefs.BT_BATTERY_LEFT, -1)
-            .putInt(CoolWPrefs.BT_BATTERY_RIGHT, -1)
-            .putString(CoolWPrefs.BT_MODE, "—")
-            .apply()
+        CoolWPrefs.prefs(this).edit(commit = false) {
+            putBoolean(CoolWPrefs.BT_CONNECTED, false)
+            putString(CoolWPrefs.BT_DEVICE_NAME, status)
+            putInt(CoolWPrefs.BT_BATTERY, -1)
+            putInt(CoolWPrefs.BT_BATTERY_LEFT, -1)
+            putInt(CoolWPrefs.BT_BATTERY_RIGHT, -1)
+            putString(CoolWPrefs.BT_MODE, "—")
+        }
 
         CoolWPrefs.notifyHeadphonesUpdate(this)
     }
@@ -210,15 +211,15 @@ class BluetoothHeadphoneService : Service() {
         var left = -1
         var right = -1
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            main = device.batteryLevel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            main = device.getBatteryLevelCompat()
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            left = device.getMetadata(BluetoothDevice.METADATA_UNTETHERED_LEFT_BATTERY)?.toBatteryPercent() ?: -1
-            right = device.getMetadata(BluetoothDevice.METADATA_UNTETHERED_RIGHT_BATTERY)?.toBatteryPercent() ?: -1
-            if (main == BluetoothDevice.BATTERY_LEVEL_UNKNOWN || main < 0) {
-                main = device.getMetadata(BluetoothDevice.METADATA_MAIN_BATTERY)?.toBatteryPercent() ?: -1
+            left = device.getMetadataCompat(METADATA_UNTETHERED_LEFT_BATTERY)?.toBatteryPercent() ?: -1
+            right = device.getMetadataCompat(METADATA_UNTETHERED_RIGHT_BATTERY)?.toBatteryPercent() ?: -1
+            if (main == BATTERY_LEVEL_UNKNOWN || main < 0) {
+                main = device.getMetadataCompat(METADATA_MAIN_BATTERY)?.toBatteryPercent() ?: -1
             }
         }
 
@@ -235,7 +236,7 @@ class BluetoothHeadphoneService : Service() {
 
     @SuppressLint("MissingPermission")
     private fun readModeFromMetadata(device: BluetoothDevice): String {
-        return "CONNECTED"
+        return device.getMetadataCompat(7)?.toMetadataString() ?: "CONNECTED"
     }
 
     private fun ByteArray.toBatteryPercent(): Int {
@@ -262,13 +263,13 @@ class BluetoothHeadphoneService : Service() {
         }
 
         if (mode != null) {
-            CoolWPrefs.prefs(this).edit().putString(CoolWPrefs.BT_MODE, mode).apply()
+            CoolWPrefs.prefs(this).edit { putString(CoolWPrefs.BT_MODE, mode) }
         }
 
         val batteryMatch = Regex("(\\d{1,3})").findAll(joined).map { it.value.toIntOrNull() ?: -1 }
             .firstOrNull { it in 0..100 }
         if (batteryMatch != null) {
-            CoolWPrefs.prefs(this).edit().putInt(CoolWPrefs.BT_BATTERY, batteryMatch).apply()
+            CoolWPrefs.prefs(this).edit { putInt(CoolWPrefs.BT_BATTERY, batteryMatch) }
         }
     }
 
@@ -315,13 +316,33 @@ class BluetoothHeadphoneService : Service() {
         private const val NOTIFICATION_ID = 1002
         private const val REFRESH_INTERVAL_MS = 30_000L
 
+        private const val ACTION_BATTERY_LEVEL_CHANGED = "android.bluetooth.device.action.BATTERY_LEVEL_CHANGED"
+        private const val BATTERY_LEVEL_UNKNOWN = -1
+        private const val METADATA_MAIN_BATTERY = 6
+        private const val METADATA_UNTETHERED_LEFT_BATTERY = 10
+        private const val METADATA_UNTETHERED_RIGHT_BATTERY = 11
+
         fun start(context: Context) {
             val intent = Intent(context, BluetoothHeadphoneService::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
-            }
+            context.startForegroundService(intent)
         }
+    }
+}
+
+private fun BluetoothDevice.getBatteryLevelCompat(): Int {
+    return try {
+        val method = javaClass.getMethod("getBatteryLevel")
+        method.invoke(this) as Int
+    } catch (_: Exception) {
+        -1
+    }
+}
+
+private fun BluetoothDevice.getMetadataCompat(key: Int): ByteArray? {
+    return try {
+        val method = javaClass.getMethod("getMetadata", Int::class.javaPrimitiveType)
+        method.invoke(this, key) as? ByteArray
+    } catch (_: Exception) {
+        null
     }
 }
