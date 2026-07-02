@@ -6,5 +6,6 @@
     android:initialLayout="@layout/widget_nothing_headphones"
     android:previewLayout="@layout/widget_nothing_headphones"
     android:label="@string/widget_name_headphones"
+    android:description="@string/widget_desc_headphones"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen" />

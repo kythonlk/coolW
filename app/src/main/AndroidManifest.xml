@@ -50,6 +50,7 @@
         <!-- Widgets -->
         <receiver
             android:name=".NothingClockWidget"
+            android:label="@string/widget_name_clock"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -65,6 +66,7 @@
 
         <receiver
             android:name=".NothingStepsWidget"
+            android:label="@string/widget_name_steps"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -78,6 +80,7 @@
 
         <receiver
             android:name=".NothingMusicWidget"
+            android:label="@string/widget_name_music"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -94,6 +97,7 @@
 
         <receiver
             android:name=".NothingHeadphonesWidget"
+            android:label="@string/widget_name_headphones"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

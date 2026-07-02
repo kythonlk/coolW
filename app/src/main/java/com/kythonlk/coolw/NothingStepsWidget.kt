@@ -9,15 +9,23 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
 import android.widget.RemoteViews
 
 class NothingStepsWidget : AppWidgetProvider() {
 
     companion object {
         const val ACTION_STEP_UPDATE = "com.kythonlk.coolw.ACTION_STEP_UPDATE"
+
+        init {
+            System.loadLibrary("coolw")
+        }
     }
+
+    // Native JNI method for ring drawing
+    private external fun nativeDrawStepsRing(
+        bitmap: Bitmap, steps: Int, goal: Int,
+        ringColor: Int, trackColor: Int, strokeWidth: Float
+    )
 
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
@@ -41,7 +49,7 @@ class NothingStepsWidget : AppWidgetProvider() {
         val source = prefs.getString(CoolWPrefs.STEPS_SOURCE, CoolWPrefs.SOURCE_NONE)
             ?: CoolWPrefs.SOURCE_NONE
 
-        val stepsRingBitmap = drawStepsRing(context, steps, goal)
+        val stepsRingBitmap = drawStepsRing(steps, goal)
 
         for (appWidgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.widget_nothing_steps)
@@ -60,35 +68,19 @@ class NothingStepsWidget : AppWidgetProvider() {
         }
     }
 
-    private fun drawStepsRing(context: Context, steps: Int, goal: Int): Bitmap {
+    private fun drawStepsRing(steps: Int, goal: Int): Bitmap {
         val size = 200
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
 
-        // Draw track circle
-        val margin = 15f
-        val rect = RectF(margin, margin, size - margin, size - margin)
-        
-        val bgPaint = Paint().apply {
-            color = Color.parseColor("#15FFFFFF")
-            style = Paint.Style.STROKE
-            strokeWidth = 10f
-            isAntiAlias = true
-        }
-        canvas.drawCircle(size / 2f, size / 2f, (size / 2f) - margin, bgPaint)
+        // Draw ring track + progress arc natively in C++
+        nativeDrawStepsRing(
+            bitmap, steps, goal,
+            Color.WHITE,                         // ring progress color
+            Color.parseColor("#15FFFFFF"),        // track color
+            10f                                   // stroke width
+        )
 
-        // Draw progress arc
-        val progressPaint = Paint().apply {
-            color = Color.WHITE
-            style = Paint.Style.STROKE
-            strokeWidth = 10f
-            strokeCap = Paint.Cap.ROUND
-            isAntiAlias = true
-        }
-        val sweepAngle = (steps.toFloat() / goal.toFloat() * 360f).coerceAtMost(360f)
-        canvas.drawArc(rect, -90f, sweepAngle, false, progressPaint)
-
-        // Draw steps count inside
+        // Overlay the step count text using native dot matrix renderer
         val stepsStr = steps.toString()
         val stepsBitmap = DotMatrixRenderer.renderText(
             text = stepsStr,
@@ -99,7 +91,8 @@ class NothingStepsWidget : AppWidgetProvider() {
             charSpacing = 4f,
             drawInactive = false
         )
-        
+
+        val canvas = Canvas(bitmap)
         val left = (size - stepsBitmap.width) / 2f
         val top = (size - stepsBitmap.height) / 2f
         canvas.drawBitmap(stepsBitmap, left, top, null)

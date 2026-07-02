@@ -6,5 +6,6 @@
     android:initialLayout="@layout/widget_nothing_steps"
     android:previewLayout="@layout/widget_nothing_steps"
     android:label="@string/widget_name_steps"
+    android:description="@string/widget_desc_steps"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen" />

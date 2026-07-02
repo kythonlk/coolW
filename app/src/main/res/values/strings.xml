@@ -5,4 +5,8 @@
     <string name="widget_name_music">Music (Nothing)</string>
     <string name="widget_name_steps">Steps (Nothing)</string>
     <string name="widget_name_headphones">Headphones (Nothing)</string>
+    <string name="widget_desc_clock">Nothing-style clock widget</string>
+    <string name="widget_desc_music">Nothing-style music control widget</string>
+    <string name="widget_desc_steps">Nothing-style step counter widget</string>
+    <string name="widget_desc_headphones">Nothing-style headphones battery widget</string>
 </resources>
