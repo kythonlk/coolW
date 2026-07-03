@@ -1,14 +1,17 @@
 package com.kythonlk.coolw
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -56,16 +59,17 @@ class AlarmReceiver : BroadcastReceiver() {
             .setAutoCancel(true)
             .build()
 
-        notificationManager.notify(todoId, notification)
+        val canNotify = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        if (canNotify) {
+            notificationManager.notify(todoId, notification)
+        }
 
         // Clear the alarm status since it went off
         val dbHelper = TodoDatabaseHelper(context)
         dbHelper.updateAlarmStatus(todoId, false)
         
         // Trigger widget update and app UI update
-        val updateIntent = Intent(context, NothingClockWidget::class.java).apply {
-            action = "com.kythonlk.coolw.UPDATE_ALL_WIDGETS"
-        }
-        context.sendBroadcast(updateIntent)
+        CoolWPrefs.notifyWidgetsUpdate(context)
     }
 }

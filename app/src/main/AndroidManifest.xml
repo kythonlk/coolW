@@ -36,6 +36,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".FinanceActivity"
+            android:exported="false" />
+
         <activity-alias
             android:name="ViewPermissionUsageActivity"
             android:exported="true"
@@ -107,6 +111,50 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/nothing_headphones_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".NothingDateWidget"
+            android:label="@string/widget_name_date"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.kythonlk.coolw.ACTION_DATE_TICK" />
+                <action android:name="com.kythonlk.coolw.UPDATE_ALL_WIDGETS" />
+                <action android:name="android.intent.action.DATE_CHANGED" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/nothing_date_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".NothingFinanceWidget"
+            android:label="@string/widget_name_finance"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.kythonlk.coolw.ACTION_FINANCE_UPDATE" />
+                <action android:name="com.kythonlk.coolw.UPDATE_ALL_WIDGETS" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/nothing_finance_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".NothingTodoWidget"
+            android:label="@string/widget_name_todo"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.kythonlk.coolw.ACTION_TODO_WIDGET_UPDATE" />
+                <action android:name="com.kythonlk.coolw.UPDATE_ALL_WIDGETS" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/nothing_todo_widget_info" />
         </receiver>
 
         <!-- Alarm Receiver -->

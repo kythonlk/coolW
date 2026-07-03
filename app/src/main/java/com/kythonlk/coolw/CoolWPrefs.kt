@@ -25,6 +25,8 @@ object CoolWPrefs {
 
     fun prefs(context: Context) = context.getSharedPreferences(NAME, Context.MODE_PRIVATE)
 
+    const val ACTION_UPDATE_ALL_WIDGETS = "com.kythonlk.coolw.UPDATE_ALL_WIDGETS"
+
     fun notifyStepsUpdate(context: Context) {
         context.sendBroadcast(
             Intent(context, NothingStepsWidget::class.java).apply {
@@ -39,5 +41,13 @@ object CoolWPrefs {
                 action = NothingHeadphonesWidget.ACTION_HEADPHONE_UPDATE
             }
         )
+    }
+
+    /**
+     * Implicit broadcast (no target component) so every manifest-registered widget
+     * provider whose intent-filter declares ACTION_UPDATE_ALL_WIDGETS receives it.
+     */
+    fun notifyWidgetsUpdate(context: Context) {
+        context.sendBroadcast(Intent(ACTION_UPDATE_ALL_WIDGETS).setPackage(context.packageName))
     }
 }

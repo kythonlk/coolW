@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/nothing_widget_background"
-    android:padding="4dp">
+    android:padding="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,10 +11,34 @@
         android:orientation="vertical"
         android:gravity="center">
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="5dp">
+
+            <ImageView
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:src="@drawable/nothing_red_dot"
+                android:layout_marginEnd="6dp"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AUDIO"
+                android:textColor="@color/nothing_text_secondary"
+                android:textSize="10sp"
+                android:fontFamily="sans-serif-black"
+                android:letterSpacing="0.15" />
+        </LinearLayout>
+
         <ImageView
             android:id="@+id/headphone_icon"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
             android:src="@drawable/ic_headphones"
             android:contentDescription="Headphones"
             android:alpha="0.9" />
@@ -24,15 +48,15 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="5dp">
 
             <TextView
                 android:id="@+id/headphone_battery_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="85%"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
+                android:textColor="@color/nothing_text_primary"
+                android:textSize="13sp"
                 android:fontFamily="sans-serif-medium" />
 
             <ImageView
@@ -50,7 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="ANC"
-                android:textColor="#FF3B30"
+                android:textColor="@color/nothing_red"
                 android:textSize="10sp"
                 android:fontFamily="sans-serif-black"
                 android:letterSpacing="0.1" />

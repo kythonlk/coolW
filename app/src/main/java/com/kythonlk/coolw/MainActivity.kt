@@ -89,8 +89,9 @@ class MainActivity : AppCompatActivity() {
         )
         binding.headerLogo.setImageBitmap(logoBitmap)
 
-        // 2. Start background sync services
-        requestPermissionsIfNeeded()
+        // 2. Resume background sync only for features the user already opted into.
+        // No permissions are requested here — each is asked for lazily, at the point
+        // where the user actually enables that specific feature (see button handlers below).
         if (hasStepPermissions()) {
             StepCounterService.start(this)
         }
@@ -99,6 +100,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 3. UI Buttons Actions
+        binding.cardOpenFinance.setOnClickListener {
+            startActivity(Intent(this, FinanceActivity::class.java))
+        }
+
         binding.btnImportJson.setOnClickListener {
             importJsonTodos()
         }
@@ -203,6 +208,7 @@ class MainActivity : AppCompatActivity() {
                 setOnCheckedChangeListener { _, isChecked ->
                     dbHelper.updateCompletion(todo.id, isChecked)
                     refreshTodoList()
+                    triggerWidgetUpdate()
                 }
             }
             itemLayout.addView(checkbox)
@@ -265,6 +271,7 @@ class MainActivity : AppCompatActivity() {
                     cancelTodoAlarm(todo.id)
                     dbHelper.deleteTodo(todo.id)
                     refreshTodoList()
+                    triggerWidgetUpdate()
                     Toast.makeText(this@MainActivity, "Task deleted", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -280,6 +287,8 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Please paste a JSON string first!", Toast.LENGTH_SHORT).show()
             return
         }
+
+        requestNotificationPermissionIfNeeded()
 
         try {
             val jsonArray = JSONArray(jsonStr)
@@ -333,6 +342,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showAddManualDialog() {
+        requestNotificationPermissionIfNeeded()
+
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_todo, null)
         val etTitle = dialogView.findViewById<EditText>(R.id.dialog_et_title)
         val etDesc = dialogView.findViewById<EditText>(R.id.dialog_et_desc)
@@ -444,24 +455,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestHealthConnectPermission() {
         if (!HealthConnectHelper.isAvailable(this)) {
-            Toast.makeText(
-                this,
-                "Install Health Connect to sync Google Fit steps",
-                Toast.LENGTH_LONG
-            ).show()
-            try {
-                startActivity(
-                    Intent(Intent.ACTION_VIEW).apply {
-                        data = Uri.parse("market://details?id=com.google.android.apps.healthdata")
-                    }
-                )
-            } catch (_: Exception) {
-                startActivity(
-                    Intent(Intent.ACTION_VIEW).apply {
-                        data = Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata")
-                    }
-                )
-            }
+            // No Health Connect on this device — offer the on-device step sensor as a
+            // lighter-weight fallback instead of forcing a Health Connect install.
+            AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                .setTitle("Health Connect not available")
+                .setMessage("Use the on-device step sensor instead, or install Health Connect from the Play Store.")
+                .setPositiveButton("Use Device Sensor") { _, _ -> requestActivityRecognitionPermission() }
+                .setNegativeButton("Install Health Connect") { _, _ -> openHealthConnectStoreListing() }
+                .show()
             return
         }
 
@@ -474,6 +475,31 @@ class MainActivity : AppCompatActivity() {
                 healthPermissionLauncher.launch(setOf(HealthConnectHelper.stepsReadPermission))
             }
         }
+    }
+
+    private fun openHealthConnectStoreListing() {
+        try {
+            startActivity(
+                Intent(Intent.ACTION_VIEW).apply {
+                    data = Uri.parse("market://details?id=com.google.android.apps.healthdata")
+                }
+            )
+        } catch (_: Exception) {
+            startActivity(
+                Intent(Intent.ACTION_VIEW).apply {
+                    data = Uri.parse("https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata")
+                }
+            )
+        }
+    }
+
+    private fun requestActivityRecognitionPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || hasStepPermissions()) {
+            StepCounterService.start(this)
+            refreshStepsUI()
+            return
+        }
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACTIVITY_RECOGNITION), 202)
     }
 
     private fun requestBluetoothPermission() {
@@ -533,23 +559,13 @@ class MainActivity : AppCompatActivity() {
 
     // --- PERMISSIONS AND SETTINGS ---
 
-    private fun requestPermissionsIfNeeded() {
-        val permissions = ArrayList<String>()
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.ACTIVITY_RECOGNITION)
-            }
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                permissions.add(Manifest.permission.POST_NOTIFICATIONS)
-            }
-        }
-
-        if (permissions.isNotEmpty()) {
-            ActivityCompat.requestPermissions(this, permissions.toTypedArray(), 200)
+    // Requested only when the user is about to schedule something that notifies them
+    // (adding/importing a todo), not eagerly on app launch.
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 200)
         }
     }
 
@@ -559,7 +575,7 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 200 && grantResults.any { it == PackageManager.PERMISSION_GRANTED }) {
+        if (requestCode == 202 && grantResults.any { it == PackageManager.PERMISSION_GRANTED }) {
             StepCounterService.start(this)
             refreshStepsUI()
         }
@@ -631,10 +647,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun triggerWidgetUpdate() {
-        val intent = Intent(this, NothingClockWidget::class.java).apply {
-            action = "com.kythonlk.coolw.UPDATE_ALL_WIDGETS"
-        }
-        sendBroadcast(intent)
+        CoolWPrefs.notifyWidgetsUpdate(this)
     }
 
     private fun hasStepPermissions(): Boolean {

@@ -7,4 +7,15 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Nothing OS design tokens -->
+    <color name="nothing_red">#FFFF3B30</color>
+    <color name="nothing_bg">#330D0D0D</color>
+    <color name="nothing_bg_flat">#0D0D0D</color>
+    <color name="nothing_border">#26FFFFFF</color>
+    <color name="nothing_divider">#15FFFFFF</color>
+    <color name="nothing_text_primary">#FFFFFFFF</color>
+    <color name="nothing_text_secondary">#88FFFFFF</color>
+    <color name="nothing_text_tertiary">#55FFFFFF</color>
+    <color name="nothing_text_faint">#33FFFFFF</color>
 </resources>

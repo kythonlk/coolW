@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/finance_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/nothing_widget_background"
@@ -11,21 +12,12 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <ImageView
-            android:id="@+id/steps_image"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
-            android:contentDescription="Steps Progress" />
-
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginTop="4dp">
+            android:layout_marginBottom="4dp">
 
             <ImageView
                 android:layout_width="6dp"
@@ -37,34 +29,32 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="STEPS"
+                android:text="BALANCE THIS MONTH"
                 android:textColor="@color/nothing_text_secondary"
-                android:textSize="10sp"
+                android:textSize="9sp"
                 android:fontFamily="sans-serif-black"
-                android:letterSpacing="0.15" />
+                android:letterSpacing="0.1" />
         </LinearLayout>
 
         <TextView
-            android:id="@+id/steps_source"
+            android:id="@+id/finance_balance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="DEVICE"
-            android:textColor="@color/nothing_text_faint"
-            android:textSize="8sp"
-            android:layout_marginTop="2dp"
-            android:fontFamily="sans-serif-medium"
-            android:letterSpacing="0.1" />
+            android:text="0.00"
+            android:textColor="@color/nothing_text_primary"
+            android:textSize="24sp"
+            android:fontFamily="monospace"
+            android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/steps_goal"
+            android:id="@+id/finance_breakdown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="GOAL: 10K"
+            android:text="+0.00  ·  -0.00"
             android:textColor="@color/nothing_text_tertiary"
-            android:textSize="9sp"
+            android:textSize="10sp"
             android:layout_marginTop="2dp"
-            android:fontFamily="sans-serif-medium"
-            android:visibility="gone" />
+            android:fontFamily="monospace" />
 
     </LinearLayout>
 </RelativeLayout>

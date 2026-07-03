@@ -10,6 +10,8 @@ import android.media.session.PlaybackState
 import android.service.notification.NotificationListenerService
 import android.util.Log
 import androidx.core.content.edit
+import android.graphics.Bitmap
+import java.io.File
 
 class MediaNotificationListener : NotificationListenerService(), MediaSessionManager.OnActiveSessionsChangedListener {
 
@@ -96,9 +98,38 @@ class MediaNotificationListener : NotificationListenerService(), MediaSessionMan
         val title = metadata.getString(MediaMetadata.METADATA_KEY_TITLE) ?: "Nothing Track"
         val artist = metadata.getString(MediaMetadata.METADATA_KEY_ARTIST) ?: "Nothing OS"
         
+        val art = metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
+            ?: metadata.getBitmap(MediaMetadata.METADATA_KEY_ART)
+
+        var hasArtwork = false
+        if (art != null) {
+            try {
+                // Scale down artwork to save memory and ensure widget can render it
+                val scaledArt = if (art.width > 512 || art.height > 512) {
+                    val ratio = art.width.toFloat() / art.height.toFloat()
+                    val targetW = if (ratio > 1) 512 else (512 * ratio).toInt()
+                    val targetH = if (ratio > 1) (512 / ratio).toInt() else 512
+                    Bitmap.createScaledBitmap(art, targetW, targetH, true)
+                } else {
+                    art
+                }
+
+                val file = File(cacheDir, "music_artwork.png")
+                file.outputStream().use {
+                    scaledArt.compress(Bitmap.CompressFormat.JPEG, 80, it)
+                }
+                hasArtwork = true
+            } catch (e: Exception) {
+                Log.e("MediaListener", "Failed to save artwork", e)
+            }
+        } else {
+            File(cacheDir, "music_artwork.png").delete()
+        }
+        
         CoolWPrefs.prefs(this).edit {
             putString("music_title", title)
             putString("music_artist", artist)
+            putBoolean("music_has_artwork", hasArtwork)
         }
         triggerWidgetUpdate()
     }

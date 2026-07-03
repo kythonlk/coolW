@@ -9,4 +9,10 @@
     <string name="widget_desc_music">Nothing-style music control widget</string>
     <string name="widget_desc_steps">Nothing-style step counter widget</string>
     <string name="widget_desc_headphones">Nothing-style headphones battery widget</string>
+    <string name="widget_name_date">Date (Nothing)</string>
+    <string name="widget_name_finance">Finance (Nothing)</string>
+    <string name="widget_name_todo">Next Task (Nothing)</string>
+    <string name="widget_desc_date">Nothing-style dot calendar widget</string>
+    <string name="widget_desc_finance">Nothing-style monthly balance widget</string>
+    <string name="widget_desc_todo">Nothing-style upcoming task widget</string>
 </resources>

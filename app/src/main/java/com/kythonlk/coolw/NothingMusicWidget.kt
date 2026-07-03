@@ -12,6 +12,8 @@ import android.os.SystemClock
 import android.view.KeyEvent
 import android.graphics.Color
 import android.widget.RemoteViews
+import android.graphics.BitmapFactory
+import java.io.File
 
 class NothingMusicWidget : AppWidgetProvider() {
 
@@ -70,13 +72,37 @@ class NothingMusicWidget : AppWidgetProvider() {
         val title = prefs.getString("music_title", "Nothing Track") ?: "Nothing Track"
         val artist = prefs.getString("music_artist", "Nothing OS") ?: "Nothing OS"
         val isPlaying = prefs.getBoolean("music_is_playing", false)
+        val hasArtwork = prefs.getBoolean("music_has_artwork", false)
 
         for (appWidgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.widget_nothing_music)
-            
+
             views.setTextViewText(R.id.music_title, title)
             views.setTextViewText(R.id.music_artist, artist)
+            views.setTextViewText(R.id.music_status, if (isPlaying) "NOW PLAYING" else "PAUSED")
+            views.setImageViewResource(R.id.music_dot, if (isPlaying) R.drawable.nothing_red_dot else R.drawable.nothing_red_dot_dim)
             views.setImageViewResource(R.id.btn_play_pause, if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play)
+
+            if (hasArtwork) {
+                val file = File(context.cacheDir, "music_artwork.png")
+                if (file.exists()) {
+                    try {
+                        val bitmap = BitmapFactory.decodeFile(file.absolutePath)
+                        if (bitmap != null) {
+                            views.setImageViewBitmap(R.id.music_artwork_bg, bitmap)
+                            views.setViewVisibility(R.id.music_artwork_bg, android.view.View.VISIBLE)
+                        } else {
+                            views.setViewVisibility(R.id.music_artwork_bg, android.view.View.GONE)
+                        }
+                    } catch (_: Exception) {
+                        views.setViewVisibility(R.id.music_artwork_bg, android.view.View.GONE)
+                    }
+                } else {
+                    views.setViewVisibility(R.id.music_artwork_bg, android.view.View.GONE)
+                }
+            } else {
+                views.setViewVisibility(R.id.music_artwork_bg, android.view.View.GONE)
+            }
             
             // Tint the play/pause icon black because it sits on a red background
             views.setInt(R.id.btn_play_pause, "setColorFilter", Color.BLACK)

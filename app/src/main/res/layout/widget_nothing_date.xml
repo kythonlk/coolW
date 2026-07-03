@@ -11,39 +11,38 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <ImageView
-            android:id="@+id/clock_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
-            android:contentDescription="Nothing Clock" />
-
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginTop="3dp">
+            android:layout_marginBottom="4dp">
 
             <ImageView
-                android:layout_width="6dp"
-                android:layout_height="6dp"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
                 android:src="@drawable/nothing_red_dot"
-                android:layout_marginEnd="6dp"
-                android:contentDescription="Red Dot" />
+                android:layout_marginEnd="10dp"
+                android:contentDescription="@null" />
 
             <TextView
-                android:id="@+id/clock_date"
+                android:id="@+id/date_month_year"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="WED, JUL 1"
+                android:text="JUL 2026"
                 android:textColor="@color/nothing_text_secondary"
-                android:textSize="11sp"
+                android:textSize="10sp"
                 android:fontFamily="sans-serif-black"
-                android:letterSpacing="0.15"
-                android:textAllCaps="true" />
+                android:letterSpacing="0.15" />
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/date_calendar_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:contentDescription="Month calendar" />
+
     </LinearLayout>
 </RelativeLayout>
